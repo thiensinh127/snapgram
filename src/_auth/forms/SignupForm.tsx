@@ -13,10 +13,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
-import { Link } from "react-router-dom";
-import { createUserAccount } from "@/lib/appwrite/api";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  useCreateUserAccount,
+  useSignInAccount,
+} from "@/lib/react-query/queriesAndMutation";
+import { useUserContext } from "@/context/AuthContext";
 const SignupForm = () => {
   const isLoading = false;
+  const navigate = useNavigate();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
@@ -27,13 +35,45 @@ const SignupForm = () => {
     },
   });
 
+  const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
+    useCreateUserAccount();
+
+  const { mutateAsync: signInAccount, isPending: isSigningIn } =
+    useSignInAccount();
+
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof SignupValidation>) {
-    const newUser = await createUserAccount(values);
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(newUser);
-  }
+  const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
+    try {
+      const newUser = await createUserAccount(user);
+
+      if (!newUser) return toast("Sign up failed. Please try again.");
+
+      const session = await signInAccount({
+        email: user.email,
+        password: user.password,
+      });
+
+      if (!session) {
+        toast("Something went wrong. Please login your new account");
+
+        navigate("/sign-in");
+
+        return;
+      }
+
+      const isLoggedIn = await checkAuthUser();
+
+      if (isLoggedIn) {
+        form.reset();
+        navigate("/");
+      } else {
+        toast("Sign up failed. Please try again.");
+        return;
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
   return (
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
@@ -46,7 +86,7 @@ const SignupForm = () => {
         </p>
 
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(handleSignup)}
           className="flex flex-col gap-5 w-full mt-4"
         >
           <FormField
@@ -97,14 +137,14 @@ const SignupForm = () => {
               <FormItem>
                 <FormLabel>PassWord</FormLabel>
                 <FormControl>
-                  <Input type="text" className="shad-input" {...field} />
+                  <Input type="password" className="shad-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <Button type="submit" className="shad-button_primary">
-            {isLoading ? (
+            {isCreatingAccount ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
