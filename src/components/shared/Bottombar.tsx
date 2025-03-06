@@ -1,4 +1,4 @@
-import { bottombarLinks, sidebarLinks } from "@/constants";
+import { bottombarLinks } from "@/constants";
 import { INavLink } from "@/types";
 import { Link, useLocation } from "react-router-dom";
 

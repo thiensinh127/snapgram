@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
 const SigninForm = () => {
-  const isLoading = false;
   const navigate = useNavigate();
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
 
@@ -30,14 +29,12 @@ const SigninForm = () => {
     },
   });
 
-  const { mutateAsync: signInAccount, isPending: isSigningIn } =
-    useSignInAccount();
+  const { mutateAsync: signInAccount } = useSignInAccount();
 
   // 2. Define a submit handler.
   const handleSignup = async (user: z.infer<typeof SigninValidation>) => {
     try {
       const session = await signInAccount(user);
-      console.log("🚀 ~ session:", session);
 
       if (!session) {
         toast("Something went wrong. Please login your new account");

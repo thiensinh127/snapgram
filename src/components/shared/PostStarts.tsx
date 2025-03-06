@@ -7,7 +7,6 @@ import {
 import { checkIsLiked } from "@/lib/utils";
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
-import { set } from "react-hook-form";
 import Loader from "./Loader";
 
 type PostStartsProps = {
@@ -33,7 +32,7 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
 
   useEffect(() => {
     setIsSaved(!!savedPostRecord);
-  }, [currentUser]);
+  }, [currentUser, savedPostRecord]);
 
   const handleLikePost = (e: React.MouseEvent) => {
     e.stopPropagation();
