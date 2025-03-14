@@ -86,7 +86,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
               <FormControl>
                 <Textarea
                   className="shad-textarea custom-scrollbar"
-                  placeholder="shadcn"
+                  placeholder="What's on your mind?"
                   {...field}
                 />
               </FormControl>

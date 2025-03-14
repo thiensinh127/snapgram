@@ -188,7 +188,7 @@ export const useSearchPosts = (searchTerm: string) => {
 
 export const useGetPosts = () => {
   return useInfiniteQuery({
-    initialPageParam: 9,
+    initialPageParam: null,
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     queryFn: getInfinitePosts,
     getNextPageParam: (lastPage: any) => {
