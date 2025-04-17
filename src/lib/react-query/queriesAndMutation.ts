@@ -22,6 +22,7 @@ import {
   signOutAccount,
   updatePost,
   updateUser,
+  withFreshJWT,
 } from "../appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { QUERY_KEYS } from "./queryKeys";
@@ -131,7 +132,7 @@ export const useDeleteSavePost = () => {
 export const useGetCurrentUser = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-    queryFn: getCurrentUser,
+    queryFn: () => withFreshJWT(() => getCurrentUser()),
   });
 };
 

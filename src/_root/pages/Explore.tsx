@@ -47,6 +47,7 @@ const Explore = () => {
             width={24}
             height={24}
             alt="search"
+            loading="lazy"
           />
           <Input
             type="text"
@@ -71,6 +72,7 @@ const Explore = () => {
             width={20}
             height={20}
             alt="filter"
+            loading="lazy"
           />
         </div>
       </div>

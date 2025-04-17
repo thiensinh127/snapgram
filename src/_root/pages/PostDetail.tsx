@@ -45,6 +45,7 @@ const PostDetails = () => {
             alt="back"
             width={24}
             height={24}
+            loading="lazy"
           />
           <p className="small-medium lg:base-medium">Back</p>
         </Button>
@@ -58,6 +59,9 @@ const PostDetails = () => {
             src={post?.imageUrl}
             alt="creator"
             className="post_details-img"
+            loading="lazy"
+            width={500}
+            height={500}
           />
 
           <div className="post_details-info">
@@ -73,6 +77,9 @@ const PostDetails = () => {
                   }
                   alt="creator"
                   className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
+                  loading="lazy"
+                  width={32}
+                  height={32}
                 />
                 <div className="flex gap-1 flex-col">
                   <p className="base-medium lg:body-bold text-light-1">
@@ -100,6 +107,7 @@ const PostDetails = () => {
                     alt="edit"
                     width={24}
                     height={24}
+                    loading="lazy"
                   />
                 </Link>
 
@@ -115,6 +123,7 @@ const PostDetails = () => {
                     alt="delete"
                     width={24}
                     height={24}
+                    loading="lazy"
                   />
                 </Button>
               </div>

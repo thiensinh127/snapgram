@@ -23,6 +23,7 @@ import {
   useCreatePost,
   useUpdatePost,
 } from "@/lib/react-query/queriesAndMutation";
+import { useEffect } from "react";
 
 type PostFormProps = {
   post?: Models.Document;
@@ -31,11 +32,13 @@ type PostFormProps = {
 const PostForm = ({ post, action }: PostFormProps) => {
   const { mutateAsync: createPost, isPending: isLoadingCreate } =
     useCreatePost();
+
   const { mutateAsync: updatePost, isPending: isLoadingUpdate } =
     useUpdatePost();
 
   const navigate = useNavigate();
   const { user } = useUserContext();
+
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -57,7 +60,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       if (!updatedPost) {
         toast("Something went wrong. Please try again.");
       }
-      return navigate(`/posts/${post.$id}`);
+      return navigate(`/post/${post.$id}`);
     }
     const newPost = await createPost({
       ...data,
@@ -68,8 +71,15 @@ const PostForm = ({ post, action }: PostFormProps) => {
       return toast("Something went wrong. Please try again.");
     }
     navigate("/");
-    console.log(data);
   };
+
+  useEffect(() => {
+    if (post && action === "Update") {
+      form.setValue("caption", post.caption);
+      form.setValue("location", post.location);
+      form.setValue("tags", post.tags);
+    }
+  }, [form, post, action]);
 
   return (
     <Form {...form}>
@@ -85,7 +95,11 @@ const PostForm = ({ post, action }: PostFormProps) => {
               <FormLabel className="shad-form_label">Caption</FormLabel>
               <FormControl>
                 <Textarea
-                  className="shad-textarea custom-scrollbar"
+                  className={`shad-textarea custom-scrollbar ${
+                    form.formState.errors.caption
+                      ? "border-red-500 focus:ring-red-500"
+                      : ""
+                  }`}
                   placeholder="What's on your mind?"
                   {...field}
                 />
@@ -156,8 +170,9 @@ const PostForm = ({ post, action }: PostFormProps) => {
             className="shad-button_primary whitespace-normal"
             disabled={isLoadingCreate || isLoadingUpdate}
           >
-            {isLoadingCreate || (isLoadingUpdate && "Loading ...")}
-            {action} Post
+            {isLoadingCreate || isLoadingUpdate
+              ? "Loading..."
+              : `${action} Post`}
           </Button>
         </div>
       </form>

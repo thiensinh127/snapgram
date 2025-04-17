@@ -1,6 +1,13 @@
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
-import { ID, ImageGravity, Query } from "appwrite";
-import { account, appwriteConfig, avatars, databases, storage } from "./config";
+import { ID, Query } from "appwrite";
+import {
+  account,
+  appwriteConfig,
+  avatars,
+  client,
+  databases,
+  storage,
+} from "./config";
 
 export async function createUserAccount(user: INewUser) {
   try {
@@ -22,6 +29,13 @@ export async function createUserAccount(user: INewUser) {
       username: user.username,
       imageUrl: avatarUrl,
     });
+
+    const jwtResponse = await account.createJWT();
+    const jwt = jwtResponse.jwt;
+
+    localStorage.setItem("appwrite-jwt", jwt);
+
+    client.setJWT(jwt);
 
     return newUser;
   } catch (error) {
@@ -53,30 +67,31 @@ export async function saveUserToDB(user: {
 
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    // Check session exists
-    const existingSession = await getAccount();
-    if (!existingSession) throw Error;
-    localStorage.setItem("cookieFallback", JSON.stringify(existingSession));
-    if (existingSession) return existingSession;
-  } catch {
-    // Create a new session
-    try {
-      const session = await account.createEmailPasswordSession(
-        user.email,
-        user.password
-      );
+    await account.deleteSessions();
+    await account.createEmailPasswordSession(user.email, user.password);
 
-      return session;
-    } catch (error) {
-      console.error("Error creating session:", error);
-      throw error;
-    }
+    await account.get();
+
+    const jwtResponse = await account.createJWT();
+    const jwt = jwtResponse.jwt;
+    localStorage.setItem("appwrite-jwt", jwt);
+    client.setJWT(jwt);
+
+    const currentUser = await account.get();
+
+    return currentUser;
+  } catch (error) {
+    console.error("Error signing in with JWT:", error);
+    throw error;
   }
 }
 
 export async function signOutAccount() {
   try {
+    localStorage.removeItem("appwrite-jwt");
+
     const session = await account.deleteSession("current");
+
     return session;
   } catch (error) {
     console.log(error);
@@ -85,19 +100,42 @@ export async function signOutAccount() {
 
 export async function getAccount() {
   try {
-    const currentAccount = await account.get();
+    const jwt = localStorage.getItem("appwrite-jwt");
+    if (jwt) {
+      client.setJWT(jwt);
+    }
 
+    const currentAccount = await account.get();
     return currentAccount;
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (error.code === 401) {
+      console.log("JWT expired or invalid. Trying to refresh...");
+
+      try {
+        const jwtResponse = await account.createJWT();
+        const newJwt = jwtResponse.jwt;
+
+        localStorage.setItem("appwrite-jwt", newJwt);
+        client.setJWT(newJwt);
+
+        const currentAccount = await account.get();
+        return currentAccount;
+      } catch (refreshError) {
+        console.error("Could not refresh JWT:", refreshError);
+        return null;
+      }
+    } else {
+      console.error("Unexpected error in getAccount:", error);
+      return null;
+    }
   }
 }
 
 export async function getCurrentUser() {
   try {
     const currentAccount = await getAccount();
+    if (!currentAccount) return null;
 
-    if (!currentAccount) throw Error;
     const queries = [Query.equal("accountId", currentAccount.$id)];
     const currentUser = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -105,33 +143,55 @@ export async function getCurrentUser() {
       queries
     );
 
-    if (!currentUser) throw Error;
+    if (!currentUser?.documents?.length) return null;
 
     return currentUser.documents[0];
   } catch (error) {
-    console.log(error);
+    console.log("Error in getCurrentUser:", error);
     return null;
+  }
+}
+
+export async function withFreshJWT<T>(callback: () => Promise<T>): Promise<T> {
+  try {
+    return await callback();
+  } catch (error: any) {
+    if (error.code === 401) {
+      try {
+        const jwtResponse = await account.createJWT();
+        const newJwt = jwtResponse.jwt;
+        localStorage.setItem("appwrite-jwt", newJwt);
+        client.setJWT(newJwt);
+
+        return await callback();
+      } catch (refreshError) {
+        console.error("Refresh JWT failed", refreshError);
+        throw refreshError;
+      }
+    }
+
+    throw error;
   }
 }
 
 export async function createPost(post: INewPost) {
   try {
-    // Upload file to appwrite storage
+    // Upload file to Appwrite storage
     const uploadedFile = await uploadFile(post.file[0]);
 
-    if (!uploadedFile) throw Error;
+    if (!uploadedFile) throw new Error("Upload failed");
 
-    // Get file url
-    const fileUrl = getFilePreview(uploadedFile.$id);
+    const fileUrl = getFileView(uploadedFile.$id);
+
     if (!fileUrl) {
       await deleteFile(uploadedFile.$id);
-      throw Error;
+      throw new Error("File view URL not found");
     }
 
     // Convert tags into array
     const tags = post.tags?.replace(/ /g, "").split(",") || [];
 
-    // Create post
+    // Create post document
     const newPost = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
@@ -148,12 +208,13 @@ export async function createPost(post: INewPost) {
 
     if (!newPost) {
       await deleteFile(uploadedFile.$id);
-      throw Error;
+      throw new Error("Creating post failed");
     }
 
     return newPost;
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    console.error("Error creating post:", error.message);
+    return null;
   }
 }
 
@@ -183,24 +244,10 @@ export async function deleteFile(fileId: string) {
 }
 
 // ============================== GET FILE URL
-export function getFilePreview(fileId: string) {
-  try {
-    const fileUrl = storage.getFilePreview(
-      appwriteConfig.storageId,
-      fileId,
-      2000,
-      2000,
-      ImageGravity.Top,
-      100
-    );
 
-    if (!fileUrl) throw Error;
-
-    return fileUrl;
-  } catch (error) {
-    console.log(error);
-  }
-}
+export const getFileView = (fileId: string) => {
+  return storage.getFileView(appwriteConfig.bucketId, fileId);
+};
 
 export async function getRecentPosts() {
   try {
@@ -296,7 +343,7 @@ export async function updatePost(post: IUpdatePost) {
       if (!uploadedFile) throw Error;
 
       // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id) as any;
+      const fileUrl = getFileView(uploadedFile.$id) as any;
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
@@ -451,7 +498,7 @@ export async function updateUser(user: IUpdateUser) {
       if (!uploadedFile) throw Error;
 
       // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
+      const fileUrl = getFileView(uploadedFile.$id);
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;

@@ -24,6 +24,7 @@ const Bottombar = () => {
               }`}
               width={16}
               height={16}
+              loading="lazy"
             />
             <p className="tiny-medium text-light-2"> {link.label}</p>
           </Link>

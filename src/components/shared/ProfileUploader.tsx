@@ -36,6 +36,7 @@ const ProfileUploader = ({ fieldChange, mediaUrl }: ProfileUploaderProps) => {
           src={fileUrl || "/assets/icons/profile-placeholder.svg"}
           alt="image"
           className="h-24 w-24 rounded-full object-cover object-top"
+          loading="lazy"
         />
         <p className="text-primary-500 small-regular md:bbase-semibold">
           Change profile photo

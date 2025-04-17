@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Vị trí của sitemap để bot index tốt hơn
+Sitemap: https://snapgram-eight-lyart.vercel.app/sitemap.xml

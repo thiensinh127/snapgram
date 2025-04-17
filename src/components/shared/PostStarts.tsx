@@ -75,6 +75,7 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
           height={20}
           className="cursor-pointer"
           onClick={handleLikePost}
+          loading="lazy"
         />
 
         <p className="small-medium lag:base-medium">{likes.length}</p>
@@ -91,6 +92,7 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
             height={20}
             className="cursor-pointer"
             onClick={handleSavePost}
+            loading="lazy"
           />
         )}
       </div>

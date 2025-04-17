@@ -7,7 +7,6 @@ import PostStarts from "./PostStarts";
 type PostCardProps = { post: Models.Document };
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
-  console.log("🚀 ~ post:", post);
 
   if (!post.creator) return;
 
@@ -23,6 +22,7 @@ const PostCard = ({ post }: PostCardProps) => {
               }
               alt="creator"
               className="rounded-full w-12 lg:h-12"
+              loading="lazy"
             />
           </Link>
           <div className="flex flex-col">
@@ -45,7 +45,13 @@ const PostCard = ({ post }: PostCardProps) => {
           to={`/update-post/${post.$id}`}
           className={`${user.id !== post.creator.$id && "hidden"}`}
         >
-          <img src="/assets/icons/edit.svg" alt="edit" width={20} height={20} />
+          <img
+            src="/assets/icons/edit.svg"
+            alt="edit"
+            width={20}
+            height={20}
+            loading="lazy"
+          />
         </Link>
       </div>
       <Link to={`/post/${post.$id}`}>
@@ -63,6 +69,7 @@ const PostCard = ({ post }: PostCardProps) => {
           src={post.imageUrl || "/assets/images/post-placeholder.svg"}
           className="post-card_img"
           alt="post image"
+          loading="lazy"
         />
       </Link>
 

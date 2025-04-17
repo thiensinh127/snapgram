@@ -18,6 +18,7 @@ const EditPost = () => {
             alt="add"
             width={36}
             height={36}
+            loading="lazy"
           />
           <h2 className="h3-bold md:h2-bold text-left w-full">Edit Post</h2>
         </div>

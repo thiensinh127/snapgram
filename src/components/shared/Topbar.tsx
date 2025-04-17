@@ -22,6 +22,7 @@ const Topbar = () => {
             alt="logo"
             width={130}
             height={325}
+            loading="lazy"
           />
         </Link>
 
@@ -31,13 +32,14 @@ const Topbar = () => {
             variant={"ghost"}
             className="shad-button__ghost"
           >
-            <img src="assets/icons/logout.svg" alt="logout" />
+            <img src="assets/icons/logout.svg" alt="" loading="lazy" />
           </Button>
           <Link to={`/profile/${user?.id}`} className="flex-center gap-3">
             <img
               src={user.imageUrl || "/assets/images/profile-placeholder.svg"}
               alt="avatar"
               className="h-8 w-8 rounded-full"
+              loading="lazy"
             />
           </Link>
         </div>

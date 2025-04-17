@@ -11,7 +11,6 @@ const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user } = useUserContext();
-  console.log("🚀 ~ user:", user);
 
   useEffect(() => {
     if (isSuccess) navigate(0);
@@ -26,6 +25,7 @@ const LeftSidebar = () => {
             alt="logo"
             width={170}
             height={36}
+            loading="lazy"
           />
         </Link>
 
@@ -34,6 +34,7 @@ const LeftSidebar = () => {
             src={user.imageUrl || "/assets/images/profile-placeholder.svg"}
             alt="profile"
             className="h-14 w-14 rounded-full"
+            loading="lazy"
           />
           <div className="flex flex-col">
             <p className="body-bold">{user.name}</p>
@@ -47,16 +48,17 @@ const LeftSidebar = () => {
               <li
                 key={link.label}
                 className={`${
-                  isActive && "bg-primary-500"
+                  isActive && "bg-blue-700"
                 } leftsidebar-link group`}
               >
                 <NavLink to={link.route} className=" flex gap-4 items-end p-4">
                   <img
                     src={link.imgURL}
-                    alt={link.label}
+                    alt=""
                     className={`group-hover:invert-white ${
                       isActive && "invert-white"
                     }`}
+                    loading="lazy"
                   />
                   {link.label}
                 </NavLink>
@@ -70,7 +72,7 @@ const LeftSidebar = () => {
         variant={"ghost"}
         className="shad-button__ghost"
       >
-        <img src="assets/icons/logout.svg" alt="logout" />
+        <img src="assets/icons/logout.svg" alt="" loading="lazy" />
         <p className="small-medium lg:base-medium">Logout</p>
       </Button>
     </nav>

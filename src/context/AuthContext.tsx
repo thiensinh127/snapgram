@@ -1,4 +1,5 @@
-import { getCurrentUser } from "@/lib/appwrite/api";
+import { getCurrentUser, withFreshJWT } from "@/lib/appwrite/api";
+import { client } from "@/lib/appwrite/config";
 import { IContextType, IUser } from "@/types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +32,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAuthUser = async () => {
     try {
-      const currentAccount = await getCurrentUser();
+      const currentAccount = await withFreshJWT(() => getCurrentUser());
       if (currentAccount) {
         setUser({
           id: currentAccount.$id,
@@ -54,16 +55,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    const cookieFallback = localStorage.getItem("cookieFallback");
-    if (
-      cookieFallback === "[]" ||
-      cookieFallback === null ||
-      cookieFallback === undefined
-    ) {
+    const jwt = localStorage.getItem("appwrite-jwt");
+    if (jwt && jwt !== "[]" && jwt !== "null") {
+      client.setJWT(jwt);
+      checkAuthUser(); // chỉ gọi nếu đã setJWT
+    } else {
       navigate("/sign-in");
     }
-
-    checkAuthUser();
   }, []);
 
   const value = {
