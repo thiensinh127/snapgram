@@ -5,6 +5,8 @@ export type IContextType = {
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   checkAuthUser: () => Promise<boolean>;
+  login: (values: ISignIn) => Promise<boolean>;
+  logout: () => Promise<boolean>;
 };
 
 export type INavLink = {
@@ -53,5 +55,10 @@ export type INewUser = {
   name: string;
   email: string;
   username: string;
+  password: string;
+};
+
+export type ISignIn = {
+  email: string;
   password: string;
 };

@@ -32,7 +32,7 @@ const SigninForm = () => {
   const { mutateAsync: signInAccount } = useSignInAccount();
 
   // 2. Define a submit handler.
-  const handleSignup = async (user: z.infer<typeof SigninValidation>) => {
+  const handleSingIn = async (user: z.infer<typeof SigninValidation>) => {
     try {
       const session = await signInAccount(user);
 
@@ -73,7 +73,7 @@ const SigninForm = () => {
         </p>
 
         <form
-          onSubmit={form.handleSubmit(handleSignup)}
+          onSubmit={form.handleSubmit(handleSingIn)}
           className="flex flex-col gap-5 w-full mt-4"
         >
           <FormField
@@ -85,7 +85,7 @@ const SigninForm = () => {
                 <FormControl>
                   <Input type="email" className="shad-input" {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-sm text-red" />
               </FormItem>
             )}
           />
@@ -99,7 +99,7 @@ const SigninForm = () => {
                 <FormControl>
                   <Input type="password" className="shad-input" {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-sm text-red" />
               </FormItem>
             )}
           />

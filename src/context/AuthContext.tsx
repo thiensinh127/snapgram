@@ -1,10 +1,22 @@
-import { getCurrentUser, withFreshJWT } from "@/lib/appwrite/api";
+import {
+  createUserAccount as apiCreateUserAccount,
+  signInAccount as apiSignInAccount,
+  signOutAccount as apiSignOutAccount,
+  getCurrentUser,
+  refreshJWT,
+} from "@/lib/appwrite/api";
 import { client } from "@/lib/appwrite/config";
-import { IContextType, IUser } from "@/types";
-import { createContext, useContext, useEffect, useState } from "react";
+import { IContextType, INewUser, ISignIn, IUser } from "@/types";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 
-export const INITIAL_USER = {
+const INITIAL_USER = {
   id: "",
   name: "",
   username: "",
@@ -20,49 +32,125 @@ const INITIAL_STATE = {
   setUser: () => {},
   setIsAuthenticated: () => {},
   checkAuthUser: async () => false as boolean,
+  login: async () => false as boolean,
+  signup: async () => null,
+  logout: async () => false as boolean,
 };
+
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUser>(INITIAL_USER);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const navigate = useNavigate();
 
-  const checkAuthUser = async () => {
+  const checkAuthUser = useCallback(async () => {
+    setIsLoading(true);
     try {
-      const currentAccount = await withFreshJWT(() => getCurrentUser());
-      if (currentAccount) {
+      let currentUser = await getCurrentUser();
+      console.log("có nhảy vô đây không");
+      //If JWT expired
+      if (!currentUser) {
+        const refreshed = await refreshJWT();
+        if (refreshed) {
+          currentUser = await getCurrentUser();
+        }
+      }
+
+      if (currentUser) {
         setUser({
-          id: currentAccount.$id,
-          name: currentAccount.name,
-          username: currentAccount.username,
-          email: currentAccount.email,
-          imageUrl: currentAccount.imageUrl,
-          bio: currentAccount.bio,
+          id: currentUser.$id,
+          name: currentUser.name,
+          username: currentUser.username,
+          email: currentUser.email,
+          imageUrl: currentUser.imageUrl,
+          bio: currentUser.bio,
         });
         setIsAuthenticated(true);
         return true;
+      } else {
+        throw new Error("No current user");
       }
-      return false;
     } catch (error) {
-      console.log(error);
+      console.error("Error in checkAuthUser:", error);
+      setIsAuthenticated(false);
+      setUser(INITIAL_USER);
+      navigate("/sign-in");
       return false;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  const login = useCallback(
+    async (values: ISignIn) => {
+      setIsLoading(true);
+      try {
+        await apiSignInAccount(values);
+        await checkAuthUser();
+        return true;
+      } catch (error) {
+        console.error("Login failed:", error);
+        setIsAuthenticated(false);
+        setUser(INITIAL_USER);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [checkAuthUser]
+  );
+
+  const signup = useCallback(
+    async (values: INewUser) => {
+      setIsLoading(true);
+      try {
+        const newUser = await apiCreateUserAccount(values);
+        await checkAuthUser();
+        return newUser;
+      } catch (error) {
+        console.error("Signup failed:", error);
+        setIsAuthenticated(false);
+        setUser(INITIAL_USER);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [checkAuthUser]
+  );
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const success = await apiSignOutAccount();
+      if (success) {
+        setIsAuthenticated(false);
+        setUser(INITIAL_USER);
+        navigate("/sign-in");
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Logout failed:", error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const jwt = localStorage.getItem("appwrite-jwt");
     if (jwt && jwt !== "[]" && jwt !== "null") {
       client.setJWT(jwt);
-      checkAuthUser(); // chỉ gọi nếu đã setJWT
+      checkAuthUser();
     } else {
+      setIsLoading(false);
       navigate("/sign-in");
     }
-  }, []);
+  }, [checkAuthUser, navigate]);
 
   const value = {
     user,
@@ -71,7 +159,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated,
     setIsAuthenticated,
     checkAuthUser,
+    login,
+    signup,
+    logout,
   };
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

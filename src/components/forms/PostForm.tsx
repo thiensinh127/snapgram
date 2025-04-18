@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -9,21 +8,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
-import FileUploader from "../shared/FileUploader";
-import { PostValidation } from "@/lib/validation";
-import { Models } from "appwrite";
 import { useUserContext } from "@/context/AuthContext";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { notifyError } from "@/hooks/useToast";
 import {
   useCreatePost,
   useUpdatePost,
 } from "@/lib/react-query/queriesAndMutation";
+import { PostValidation } from "@/lib/validation";
+import { Models } from "appwrite";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import * as z from "zod";
+import FileUploader from "../shared/FileUploader";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 type PostFormProps = {
   post?: Models.Document;
@@ -45,7 +45,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
       caption: post ? post?.caption : "",
       file: [],
       location: post ? post?.location : "",
-      tags: post ? post?.tags : "",
+      tags: post ? post?.tags.join(", ") : "",
     },
   });
 
@@ -58,7 +58,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
         imageUrl: post?.imageUrl,
       });
       if (!updatedPost) {
-        toast("Something went wrong. Please try again.");
+        return notifyError("Something went wrong. Please try again");
       }
       return navigate(`/post/${post.$id}`);
     }
@@ -68,7 +68,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     });
 
     if (!newPost) {
-      return toast("Something went wrong. Please try again.");
+      return notifyError("Something went wrong. Please try again");
     }
     navigate("/");
   };
@@ -77,7 +77,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     if (post && action === "Update") {
       form.setValue("caption", post.caption);
       form.setValue("location", post.location);
-      form.setValue("tags", post.tags);
+      form.setValue("tags", post.tags.join(", "));
     }
   }, [form, post, action]);
 
@@ -92,14 +92,13 @@ const PostForm = ({ post, action }: PostFormProps) => {
           name="caption"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Caption</FormLabel>
+              <FormLabel className="shad-form_label">
+                {" "}
+                Caption <span className="text-red">*</span>{" "}
+              </FormLabel>
               <FormControl>
                 <Textarea
-                  className={`shad-textarea custom-scrollbar ${
-                    form.formState.errors.caption
-                      ? "border-red-500 focus:ring-red-500"
-                      : ""
-                  }`}
+                  className={`shad-textarea custom-scrollbar`}
                   placeholder="What's on your mind?"
                   {...field}
                 />
@@ -113,7 +112,10 @@ const PostForm = ({ post, action }: PostFormProps) => {
           name="file"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Add photos</FormLabel>
+              <FormLabel className="shad-form_label">
+                {" "}
+                Add Photo <span className="text-red">*</span>
+              </FormLabel>
               <FormControl>
                 <FileUploader
                   fieldChange={field.onChange}
@@ -131,7 +133,12 @@ const PostForm = ({ post, action }: PostFormProps) => {
             <FormItem>
               <FormLabel className="shad-form_label">Add Location</FormLabel>
               <FormControl>
-                <Input type="text" className="shad-input" {...field} />
+                <Input
+                  type="text"
+                  className="shad-input"
+                  {...field}
+                  placeholder="Enter location"
+                />
               </FormControl>
               <FormMessage className="shad-form_message" />
             </FormItem>

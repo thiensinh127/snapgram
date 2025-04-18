@@ -67,10 +67,17 @@ export async function saveUserToDB(user: {
 
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    await account.deleteSessions();
+    try {
+      const session = await account.getSession("current");
+      if (session) {
+        await account.deleteSessions();
+      }
+    } catch (sessionError: any) {
+      if (sessionError.code !== 401) {
+        throw sessionError;
+      }
+    }
     await account.createEmailPasswordSession(user.email, user.password);
-
-    await account.get();
 
     const jwtResponse = await account.createJWT();
     const jwt = jwtResponse.jwt;
@@ -78,10 +85,9 @@ export async function signInAccount(user: { email: string; password: string }) {
     client.setJWT(jwt);
 
     const currentUser = await account.get();
-
     return currentUser;
   } catch (error) {
-    console.error("Error signing in with JWT:", error);
+    console.error("Error signing in:", error);
     throw error;
   }
 }
@@ -89,45 +95,47 @@ export async function signInAccount(user: { email: string; password: string }) {
 export async function signOutAccount() {
   try {
     localStorage.removeItem("appwrite-jwt");
-
-    const session = await account.deleteSession("current");
-
-    return session;
+    await account.deleteSessions();
+    return true;
   } catch (error) {
-    console.log(error);
+    console.log("Error signing out:", error);
+    return false;
   }
 }
 
 export async function getAccount() {
   try {
     const jwt = localStorage.getItem("appwrite-jwt");
+
     if (jwt) {
       client.setJWT(jwt);
-    }
-
-    const currentAccount = await account.get();
-    return currentAccount;
-  } catch (error: any) {
-    if (error.code === 401) {
-      console.log("JWT expired or invalid. Trying to refresh...");
-
       try {
-        const jwtResponse = await account.createJWT();
-        const newJwt = jwtResponse.jwt;
-
-        localStorage.setItem("appwrite-jwt", newJwt);
-        client.setJWT(newJwt);
-
         const currentAccount = await account.get();
         return currentAccount;
-      } catch (refreshError) {
-        console.error("Could not refresh JWT:", refreshError);
-        return null;
+      } catch (error: any) {
+        if (error.code === 401) {
+          console.log(
+            "JWT expired or session invalid. Attempting to refresh in getAccount..."
+          );
+
+          const refreshed = await refreshJWT();
+          if (refreshed) {
+            return await account.get();
+          } else {
+            console.error("Failed to refresh JWT.");
+            return null;
+          }
+        } else {
+          console.error("Unexpected error in getAccount:", error);
+          return null;
+        }
       }
     } else {
-      console.error("Unexpected error in getAccount:", error);
       return null;
     }
+  } catch (error: any) {
+    console.error("Unexpected error in getAccount (outer try):", error);
+    return null;
   }
 }
 
@@ -152,27 +160,20 @@ export async function getCurrentUser() {
   }
 }
 
-export async function withFreshJWT<T>(callback: () => Promise<T>): Promise<T> {
+export const refreshJWT = async () => {
   try {
-    return await callback();
-  } catch (error: any) {
-    if (error.code === 401) {
-      try {
-        const jwtResponse = await account.createJWT();
-        const newJwt = jwtResponse.jwt;
-        localStorage.setItem("appwrite-jwt", newJwt);
-        client.setJWT(newJwt);
-
-        return await callback();
-      } catch (refreshError) {
-        console.error("Refresh JWT failed", refreshError);
-        throw refreshError;
-      }
-    }
-
-    throw error;
+    const jwtResponse = await account.createJWT();
+    const newJwt = jwtResponse.jwt;
+    localStorage.setItem("appwrite-jwt", newJwt);
+    client.setJWT(newJwt);
+    return true;
+  } catch (error) {
+    console.error("JWT refresh failed:", error);
+    localStorage.removeItem("appwrite-jwt");
+    await account.deleteSessions(); // Xóa phiên nếu không thể làm mới token
+    return false;
   }
-}
+};
 
 export async function createPost(post: INewPost) {
   try {

@@ -1,8 +1,9 @@
+import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import {
   createPost,
@@ -22,9 +23,7 @@ import {
   signOutAccount,
   updatePost,
   updateUser,
-  withFreshJWT,
 } from "../appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { QUERY_KEYS } from "./queryKeys";
 
 export const useCreateUserAccount = () => {
@@ -132,7 +131,7 @@ export const useDeleteSavePost = () => {
 export const useGetCurrentUser = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_CURRENT_USER],
-    queryFn: () => withFreshJWT(() => getCurrentUser()),
+    queryFn: getCurrentUser,
   });
 };
 
