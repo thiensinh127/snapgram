@@ -16,25 +16,31 @@ import {
 import "./globals.css";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
+import PrivateRoute from "./components/PrivateRoute";
+
 const App = () => {
   return (
     <main className="flex h-screen">
       <Routes>
+        {/* Auth routes */}
         <Route element={<AuthLayout />}>
-          <Route path="/sign-in" element={<SigninForm />}></Route>
-          <Route path="/sign-up" element={<SignupForm />}></Route>
+          <Route path="/sign-in" element={<SigninForm />} />
+          <Route path="/sign-up" element={<SignupForm />} />
         </Route>
 
-        <Route element={<RootLayout />}>
-          <Route index element={<Home />} />
-          <Route index path="/explore" element={<Explore />} />
-          <Route index path="/saved" element={<Saved />} />
-          <Route index path="/all-users" element={<AllUsers />} />
-          <Route index path="/create-post" element={<CreatePost />} />
-          <Route index path="/update-post/:id" element={<EditPost />} />
-          <Route index path="/post/:id" element={<PostDetail />} />
-          <Route index path="/profile/:id" element={<Profile />} />
-          <Route index path="/update-profile/:id" element={<UpdateProfile />} />
+        {/* Protected routes */}
+        <Route element={<PrivateRoute />}>
+          <Route element={<RootLayout />}>
+            <Route index element={<Home />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/saved" element={<Saved />} />
+            <Route path="/all-users" element={<AllUsers />} />
+            <Route path="/create-post" element={<CreatePost />} />
+            <Route path="/update-post/:id" element={<EditPost />} />
+            <Route path="/post/:id" element={<PostDetail />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/update-profile/:id" element={<UpdateProfile />} />
+          </Route>
         </Route>
       </Routes>
 

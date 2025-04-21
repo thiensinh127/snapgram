@@ -20,9 +20,12 @@ import {
   useSignInAccount,
 } from "@/lib/react-query/queriesAndMutation";
 import { useUserContext } from "@/context/AuthContext";
+import { EyeOff, Eye } from "lucide-react";
+import { useState } from "react";
 const SignupForm = () => {
   const navigate = useNavigate();
   const { checkAuthUser } = useUserContext();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -72,10 +75,17 @@ const SignupForm = () => {
       console.log({ error });
     }
   };
+
   return (
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
-        <img src="/assets/images/logo.svg" alt="logo" loading="lazy" width={130} height={325} />
+        <img
+          src="/assets/images/logo.svg"
+          alt="logo"
+          loading="lazy"
+          width={130}
+          height={325}
+        />
         <h2 className="h3-bold md:h2bold pt-5 sm:pt-12">
           Create a new account
         </h2>
@@ -94,9 +104,15 @@ const SignupForm = () => {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input type="text" className="shad-input" {...field} />
+                  <Input
+                    placeholder="Enter your name"
+                    autoComplete="name"
+                    type="text"
+                    className="shad-input"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-sm text-red" />
               </FormItem>
             )}
           />
@@ -108,9 +124,15 @@ const SignupForm = () => {
               <FormItem>
                 <FormLabel>User Name</FormLabel>
                 <FormControl>
-                  <Input type="text" className="shad-input" {...field} />
+                  <Input
+                    placeholder="Enter your username"
+                    autoComplete="username"
+                    type="text"
+                    className="shad-input"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-sm text-red" />
               </FormItem>
             )}
           />
@@ -121,9 +143,15 @@ const SignupForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" className="shad-input" {...field} />
+                  <Input
+                    placeholder="Enter your email"
+                    autoComplete="email"
+                    type="email"
+                    className="shad-input"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-sm text-red" />
               </FormItem>
             )}
           />
@@ -133,14 +161,30 @@ const SignupForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>PassWord</FormLabel>
-                <FormControl>
-                  <Input type="password" className="shad-input" {...field} />
-                </FormControl>
-                <FormMessage />
+                <FormLabel>Password</FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your password"
+                      autoComplete="password"
+                      type={showPassword ? "text" : "password"}
+                      className="shad-input pr-10"
+                      {...field}
+                    />
+                  </FormControl>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  >
+                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                  </button>
+                </div>
+                <FormMessage className="text-sm text-red" />
               </FormItem>
             )}
           />
+
           <Button type="submit" className="shad-button_primary">
             {isCreatingAccount ? (
               <div className="flex-center gap-2">

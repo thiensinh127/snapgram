@@ -1,14 +1,8 @@
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { ID, Query } from "appwrite";
-import {
-  account,
-  appwriteConfig,
-  avatars,
-  client,
-  databases,
-  storage,
-} from "./config";
+import { account, appwriteConfig, avatars, databases, storage } from "./config";
 
+// Tạo tài khoản và lưu user vào DB
 export async function createUserAccount(user: INewUser) {
   try {
     const newAccount = await account.create(
@@ -18,7 +12,7 @@ export async function createUserAccount(user: INewUser) {
       user.name
     );
 
-    if (!newAccount) throw Error;
+    if (!newAccount) throw new Error("Failed to create Appwrite account");
 
     const avatarUrl = avatars.getInitials(user.name);
 
@@ -30,12 +24,8 @@ export async function createUserAccount(user: INewUser) {
       imageUrl: avatarUrl,
     });
 
-    const jwtResponse = await account.createJWT();
-    const jwt = jwtResponse.jwt;
-
-    localStorage.setItem("appwrite-jwt", jwt);
-
-    client.setJWT(jwt);
+    // Tạo session sau khi đăng ký
+    await account.createEmailPasswordSession(user.email, user.password);
 
     return newUser;
   } catch (error) {
@@ -44,6 +34,7 @@ export async function createUserAccount(user: INewUser) {
   }
 }
 
+// Lưu user vào DB Appwrite
 export async function saveUserToDB(user: {
   accountId: string;
   email: string;
@@ -58,31 +49,24 @@ export async function saveUserToDB(user: {
       ID.unique(),
       user
     );
-
     return newUser;
   } catch (error) {
     console.log(error);
   }
 }
 
+// Đăng nhập người dùng
 export async function signInAccount(user: { email: string; password: string }) {
   try {
+    // Nếu đã có session hiện tại thì xóa trước
     try {
       const session = await account.getSession("current");
-      if (session) {
-        await account.deleteSessions();
-      }
+      if (session) await account.deleteSessions();
     } catch (sessionError: any) {
-      if (sessionError.code !== 401) {
-        throw sessionError;
-      }
+      if (sessionError.code !== 401) throw sessionError;
     }
-    await account.createEmailPasswordSession(user.email, user.password);
 
-    const jwtResponse = await account.createJWT();
-    const jwt = jwtResponse.jwt;
-    localStorage.setItem("appwrite-jwt", jwt);
-    client.setJWT(jwt);
+    await account.createEmailPasswordSession(user.email, user.password);
 
     const currentUser = await account.get();
     return currentUser;
@@ -92,9 +76,9 @@ export async function signInAccount(user: { email: string; password: string }) {
   }
 }
 
+// Đăng xuất người dùng
 export async function signOutAccount() {
   try {
-    localStorage.removeItem("appwrite-jwt");
     await account.deleteSessions();
     return true;
   } catch (error) {
@@ -103,42 +87,22 @@ export async function signOutAccount() {
   }
 }
 
+// Lấy thông tin tài khoản từ Appwrite
 export async function getAccount() {
   try {
-    const jwt = localStorage.getItem("appwrite-jwt");
-
-    if (jwt) {
-      client.setJWT(jwt);
-      try {
-        const currentAccount = await account.get();
-        return currentAccount;
-      } catch (error: any) {
-        if (error.code === 401) {
-          console.log(
-            "JWT expired or session invalid. Attempting to refresh in getAccount..."
-          );
-
-          const refreshed = await refreshJWT();
-          if (refreshed) {
-            return await account.get();
-          } else {
-            console.error("Failed to refresh JWT.");
-            return null;
-          }
-        } else {
-          console.error("Unexpected error in getAccount:", error);
-          return null;
-        }
-      }
-    } else {
+    const currentAccount = await account.get();
+    return currentAccount;
+  } catch (error: any) {
+    if (error.code === 401) {
+      // Không có session hợp lệ
       return null;
     }
-  } catch (error: any) {
-    console.error("Unexpected error in getAccount (outer try):", error);
+    console.error("Unexpected error in getAccount:", error);
     return null;
   }
 }
 
+// Lấy user từ DB (user collection) dựa vào accountId
 export async function getCurrentUser() {
   try {
     const currentAccount = await getAccount();
@@ -159,21 +123,6 @@ export async function getCurrentUser() {
     return null;
   }
 }
-
-export const refreshJWT = async () => {
-  try {
-    const jwtResponse = await account.createJWT();
-    const newJwt = jwtResponse.jwt;
-    localStorage.setItem("appwrite-jwt", newJwt);
-    client.setJWT(newJwt);
-    return true;
-  } catch (error) {
-    console.error("JWT refresh failed:", error);
-    localStorage.removeItem("appwrite-jwt");
-    await account.deleteSessions(); // Xóa phiên nếu không thể làm mới token
-    return false;
-  }
-};
 
 export async function createPost(post: INewPost) {
   try {

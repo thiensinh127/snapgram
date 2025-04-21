@@ -3,9 +3,7 @@ import {
   signInAccount as apiSignInAccount,
   signOutAccount as apiSignOutAccount,
   getCurrentUser,
-  refreshJWT,
 } from "@/lib/appwrite/api";
-import { client } from "@/lib/appwrite/config";
 import { IContextType, INewUser, ISignIn, IUser } from "@/types";
 import {
   createContext,
@@ -25,16 +23,15 @@ const INITIAL_USER = {
   bio: "",
 };
 
-const INITIAL_STATE = {
+const INITIAL_STATE: IContextType = {
   user: INITIAL_USER,
   isLoading: false,
   isAuthenticated: false,
   setUser: () => {},
   setIsAuthenticated: () => {},
-  checkAuthUser: async () => false as boolean,
-  login: async () => false as boolean,
-  signup: async () => null,
-  logout: async () => false as boolean,
+  checkAuthUser: async () => false,
+  login: async () => false,
+  logout: async () => false,
 };
 
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
@@ -49,15 +46,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const checkAuthUser = useCallback(async () => {
     setIsLoading(true);
     try {
-      let currentUser = await getCurrentUser();
-      console.log("có nhảy vô đây không");
-      //If JWT expired
-      if (!currentUser) {
-        const refreshed = await refreshJWT();
-        if (refreshed) {
-          currentUser = await getCurrentUser();
-        }
-      }
+      const currentUser = await getCurrentUser();
 
       if (currentUser) {
         setUser({
@@ -142,15 +131,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [navigate]);
 
   useEffect(() => {
-    const jwt = localStorage.getItem("appwrite-jwt");
-    if (jwt && jwt !== "[]" && jwt !== "null") {
-      client.setJWT(jwt);
-      checkAuthUser();
-    } else {
-      setIsLoading(false);
-      navigate("/sign-in");
-    }
-  }, [checkAuthUser, navigate]);
+    checkAuthUser();
+  }, [checkAuthUser]);
 
   const value = {
     user,
@@ -168,5 +150,4 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default AuthProvider;
-
 export const useUserContext = () => useContext(AuthContext);
