@@ -14,7 +14,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import {
   useCreateUserAccount,
   useSignInAccount,
@@ -22,6 +21,7 @@ import {
 import { useUserContext } from "@/context/AuthContext";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
+import { showToast } from "@/components/shared/Toast";
 const SignupForm = () => {
   const navigate = useNavigate();
   const { checkAuthUser } = useUserContext();
@@ -47,7 +47,11 @@ const SignupForm = () => {
     try {
       const newUser = await createUserAccount(user);
 
-      if (!newUser) return toast("Sign up failed. Please try again.");
+      if (!newUser)
+        return showToast({
+          message: "Sign up failed. Please try again.",
+          type: "error",
+        });
 
       const session = await signInAccount({
         email: user.email,
@@ -55,7 +59,10 @@ const SignupForm = () => {
       });
 
       if (!session) {
-        toast("Something went wrong. Please login your new account");
+        showToast({
+          message: "Something went wrong. Please login your new account",
+          type: "error",
+        });
 
         navigate("/sign-in");
 
@@ -68,7 +75,10 @@ const SignupForm = () => {
         form.reset();
         navigate("/");
       } else {
-        toast("Sign up failed. Please try again.");
+        showToast({
+          message: "Sign up failed. Please try again",
+          type: "error",
+        });
         return;
       }
     } catch (error) {
@@ -177,7 +187,7 @@ const SignupForm = () => {
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                   >
-                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
                 <FormMessage className="text-sm text-red" />

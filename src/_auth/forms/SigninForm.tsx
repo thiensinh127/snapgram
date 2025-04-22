@@ -14,11 +14,11 @@ import { SigninValidation } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "../../components/ui/button";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { showToast } from "@/components/shared/Toast";
 const SigninForm = () => {
   const navigate = useNavigate();
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
@@ -41,7 +41,10 @@ const SigninForm = () => {
       const session = await signInAccount(user);
 
       if (!session) {
-        toast.error("Invalid credentials. Please try again.");
+        showToast({
+          message: "Invalid credentials. Please try again.",
+          type: "error",
+        });
         return;
       }
 
@@ -51,13 +54,19 @@ const SigninForm = () => {
         form.reset();
         navigate("/");
       } else {
-        toast.error("Sign in failed. Please try again.");
+        showToast({
+          message: "Sign in failed. Please try again.",
+          type: "error",
+        });
       }
     } catch (error: any) {
       console.log({ error });
 
       const message = error?.message || "Sign in error. Please try again.";
-      toast.error(message);
+      showToast({
+        message: message,
+        type: "error",
+      });
     }
   };
 
@@ -123,7 +132,7 @@ const SigninForm = () => {
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                   >
-                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
                 <FormMessage className="text-sm text-red" />

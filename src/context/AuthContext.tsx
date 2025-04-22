@@ -12,7 +12,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const INITIAL_USER = {
   id: "",
@@ -42,6 +42,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const checkAuthUser = useCallback(async () => {
     setIsLoading(true);
@@ -66,12 +67,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Error in checkAuthUser:", error);
       setIsAuthenticated(false);
       setUser(INITIAL_USER);
-      navigate("/sign-in");
+      if (!["/sign-in", "/sign-up"].includes(location.pathname)) {
+        navigate("/sign-in");
+      }
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const login = useCallback(
     async (values: ISignIn) => {

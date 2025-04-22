@@ -2,7 +2,6 @@ import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { ID, Query } from "appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 
-// Tạo tài khoản và lưu user vào DB
 export async function createUserAccount(user: INewUser) {
   try {
     const newAccount = await account.create(
@@ -24,7 +23,6 @@ export async function createUserAccount(user: INewUser) {
       imageUrl: avatarUrl,
     });
 
-    // Tạo session sau khi đăng ký
     await account.createEmailPasswordSession(user.email, user.password);
 
     return newUser;
@@ -34,7 +32,6 @@ export async function createUserAccount(user: INewUser) {
   }
 }
 
-// Lưu user vào DB Appwrite
 export async function saveUserToDB(user: {
   accountId: string;
   email: string;
@@ -55,10 +52,8 @@ export async function saveUserToDB(user: {
   }
 }
 
-// Đăng nhập người dùng
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    // Nếu đã có session hiện tại thì xóa trước
     try {
       const session = await account.getSession("current");
       if (session) await account.deleteSessions();
@@ -76,7 +71,6 @@ export async function signInAccount(user: { email: string; password: string }) {
   }
 }
 
-// Đăng xuất người dùng
 export async function signOutAccount() {
   try {
     await account.deleteSessions();
@@ -87,22 +81,18 @@ export async function signOutAccount() {
   }
 }
 
-// Lấy thông tin tài khoản từ Appwrite
 export async function getAccount() {
   try {
     const currentAccount = await account.get();
     return currentAccount;
   } catch (error: any) {
     if (error.code === 401) {
-      // Không có session hợp lệ
       return null;
     }
     console.error("Unexpected error in getAccount:", error);
     return null;
   }
 }
-
-// Lấy user từ DB (user collection) dựa vào accountId
 export async function getCurrentUser() {
   try {
     const currentAccount = await getAccount();
