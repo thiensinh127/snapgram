@@ -26,7 +26,6 @@ const GridPostList = ({
               src={post.imageUrl}
               alt="post"
               className="h-full w-full object-cover"
-              loading="lazy"
             />
           </Link>
 
@@ -40,7 +39,6 @@ const GridPostList = ({
                   }
                   alt="creator"
                   className="w-8 h-8 rounded-full"
-                  loading="lazy"
                 />
                 <p className="line-clamp-1">{post.creator.name}</p>
               </div>
