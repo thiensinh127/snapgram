@@ -1,17 +1,16 @@
+import GridPostList from "@/components/shared/GridPostList";
+import { Button } from "@/components/ui/button";
+import { useUserContext } from "@/context/AuthContext";
+import { useGetUserById } from "@/lib/react-query/queriesAndMutation";
+import { Loader } from "lucide-react";
 import {
-  Route,
-  Routes,
   Link,
   Outlet,
-  useParams,
+  Route,
+  Routes,
   useLocation,
+  useParams,
 } from "react-router-dom";
-
-import { useUserContext } from "@/context/AuthContext";
-import GridPostList from "@/components/shared/GridPostList";
-import Loader from "@/components/shared/Loader";
-import { Button } from "@/components/ui/button";
-import { useGetUserById } from "@/lib/react-query/queriesAndMutation";
 import LikedPosts from "./LikePost";
 
 interface StabBlockProps {
