@@ -2,6 +2,8 @@ import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
 import { useGetCurrentUser } from "@/lib/react-query/queriesAndMutation";
 import { Models } from "appwrite";
+import { Bookmark } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Saved = () => {
   const { data: currentUser } = useGetCurrentUser();
@@ -17,28 +19,25 @@ const Saved = () => {
 
   return (
     <div className="saved-container">
-      <div className="flex gap-2 w-full max-w-5xl">
-        <img
-          src="/assets/icons/save.svg"
-          width={36}
-          height={36}
-          alt="edit"
-          className="invert-white"
-          loading="lazy"
-        />
-        <h2 className="h3-bold md:h2-bold text-left w-full">Saved Posts</h2>
+      <div className="page-header w-full max-w-5xl">
+        <span className="page-header-icon"><Bookmark size={22} aria-hidden="true" /></span>
+        <div>
+          <p className="feed-eyebrow">Your collection</p>
+          <h1 className="h3-bold md:h2-bold">Saved posts</h1>
+          <p className="small-regular text-light-3">{savePosts?.length ?? 0} moments kept for later.</p>
+        </div>
       </div>
 
       {!currentUser ? (
         <Loader />
       ) : (
-        <ul className="w-full flex justify-center max-w-5xl gap-9">
+        <div className="w-full max-w-5xl">
           {savePosts.length === 0 ? (
-            <p className="text-light-4">No available posts</p>
+            <div className="empty-state"><p className="body-bold">Your collection is waiting</p><p className="small-regular text-light-3">Save posts you want to revisit later.</p><Link to="/explore" className="feed-retry">Explore posts</Link></div>
           ) : (
             <GridPostList posts={savePosts} showStats={false} />
           )}
-        </ul>
+        </div>
       )}
     </div>
   );

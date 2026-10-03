@@ -15,7 +15,7 @@ export const SearchResults = ({
     return <GridPostList posts={searchedPosts.documents} />;
   } else {
     return (
-      <p className="text-light-4 mt-10 text-center w-full">No results found</p>
+      <div className="empty-state"><p className="body-bold">No matching posts</p><p className="small-regular text-light-3">Try another keyword or explore popular posts.</p></div>
     );
   }
 };
