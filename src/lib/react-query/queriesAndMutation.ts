@@ -64,6 +64,18 @@ export const useGetRecentPosts = () => {
   });
 };
 
+export const useGetHomePosts = () => {
+  return useInfiniteQuery({
+    initialPageParam: null as string | null,
+    queryKey: [QUERY_KEYS.GET_HOME_POSTS],
+    queryFn: getInfinitePosts,
+    getNextPageParam: (lastPage) => {
+      const documents = lastPage?.documents ?? [];
+      return documents.length ? documents[documents.length - 1].$id : undefined;
+    },
+  });
+};
+
 export const useLikePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -188,18 +200,13 @@ export const useSearchPosts = (searchTerm: string) => {
 
 export const useGetPosts = () => {
   return useInfiniteQuery({
-    initialPageParam: null,
+    initialPageParam: null as string | null,
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     queryFn: getInfinitePosts,
     getNextPageParam: (lastPage: any) => {
       // If there's no data, there are no more pages.
-      if (lastPage && lastPage.documents.length === 0) {
-        return null;
-      }
-
-      // Use the $id of the last document as the cursor.
-      const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
-      return lastId;
+      const documents = lastPage?.documents ?? [];
+      return documents.length ? documents[documents.length - 1].$id : undefined;
     },
   });
 };
