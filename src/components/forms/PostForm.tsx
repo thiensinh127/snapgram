@@ -85,13 +85,28 @@ const PostForm = ({ post, action }: PostFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-9 w-full max-w-5xl"
+        className="create-post-form"
       >
-        <FormField
-          control={form.control}
-          name="caption"
-          render={({ field }) => (
-            <FormItem>
+        <div className="create-post-grid">
+          <FormField
+            control={form.control}
+            name="file"
+            render={({ field }) => (
+              <FormItem className="create-post-panel create-upload-panel">
+                <FormLabel className="shad-form_label">Add a photo <span className="text-red">*</span></FormLabel>
+                <FormControl>
+                  <FileUploader fieldChange={field.onChange} mediaUrl={post?.imageUrl} />
+                </FormControl>
+                <FormMessage className="shad-form_message" />
+              </FormItem>
+            )}
+          />
+          <div className="create-post-fields">
+            <FormField
+              control={form.control}
+              name="caption"
+              render={({ field }) => (
+                <FormItem className="create-post-panel">
               <FormLabel className="shad-form_label">
                 {" "}
                 Caption <span className="text-red">*</span>{" "}
@@ -99,56 +114,37 @@ const PostForm = ({ post, action }: PostFormProps) => {
               <FormControl>
                 <Textarea
                   className={`shad-textarea custom-scrollbar`}
-                  placeholder="What's on your mind?"
+                  placeholder="Tell the story behind this moment..."
                   {...field}
                 />
               </FormControl>
               <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="file"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">
-                {" "}
-                Add Photo <span className="text-red">*</span>
-              </FormLabel>
-              <FormControl>
-                <FileUploader
-                  fieldChange={field.onChange}
-                  mediaUrl={post?.imageUrl}
-                />
-              </FormControl>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem className="create-post-panel">
               <FormLabel className="shad-form_label">Add Location</FormLabel>
               <FormControl>
                 <Input
                   type="text"
                   className="shad-input"
                   {...field}
-                  placeholder="Enter location"
+                  placeholder="e.g. Ho Chi Minh City"
                 />
               </FormControl>
               <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem className="create-post-panel">
               <FormLabel className="shad-form_label">
                 Add Tags (separated by comma " , ")
               </FormLabel>
@@ -156,25 +152,27 @@ const PostForm = ({ post, action }: PostFormProps) => {
                 <Input
                   type="text"
                   className="shad-input"
-                  placeholder="JS, react, NextJS"
+                  placeholder="e.g. travel, photography, weekend"
                   {...field}
                 />
               </FormControl>
               <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-        <div className="flex items-center justify-end gap-4">
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+        <div className="create-post-actions">
           <Button
             onClick={() => navigate(-1)}
             type="button"
-            className="shad-button_dark_4"
+            className="shad-button_dark_4 h-11 min-w-[112px] justify-center px-5"
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            className="shad-button_primary whitespace-normal"
+            className="shad-button_primary h-11 min-w-[112px] justify-center px-5 whitespace-nowrap"
             disabled={isLoadingCreate || isLoadingUpdate}
           >
             {isLoadingCreate || isLoadingUpdate
