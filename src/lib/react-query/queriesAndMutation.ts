@@ -25,6 +25,7 @@ import {
   updateUser,
 } from "../appwrite/api";
 import { QUERY_KEYS } from "./queryKeys";
+import { updateCachedPost } from "./postCache";
 
 export const useCreateUserAccount = () => {
   return useMutation({
@@ -87,15 +88,7 @@ export const useLikePost = () => {
       likeArray: string[];
     }) => likePost(postId, likeArray),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.$id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
+      if (data) updateCachedPost(queryClient, data);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
@@ -110,12 +103,6 @@ export const useSavePost = () => {
       savePost(postId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
-      queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
     },
@@ -127,12 +114,6 @@ export const useDeleteSavePost = () => {
   return useMutation({
     mutationFn: (savedRecordId: string) => deleteSavePost(savedRecordId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });

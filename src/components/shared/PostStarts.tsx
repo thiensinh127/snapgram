@@ -14,7 +14,7 @@ type PostStartsProps = {
   userId: string;
 };
 const PostStarts = ({ post, userId }: PostStartsProps) => {
-  const likeList = post.likes.map((user: Models.Document) => user.$id);
+  const likeList = post.likes?.map((user: Models.Document) => user.$id) ?? [];
 
   const [likes, setLikes] = useState(likeList);
   const [isSaved, setIsSaved] = useState(false);
@@ -64,19 +64,23 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
   return (
     <div className="flex justify-between items-center z-20">
       <div className="flex gap-2 mr-5">
-        <img
-          src={
-            checkIsLiked(likes, userId)
-              ? "/assets/icons/liked.svg"
-              : "/assets/icons/like.svg"
-          }
-          alt="like"
-          width={20}
-          height={20}
-          className="cursor-pointer"
+        <button
+          type="button"
+          className="flex h-11 w-11 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           onClick={handleLikePost}
-          loading="lazy"
-        />
+          aria-label={checkIsLiked(likes, userId) ? "Unlike post" : "Like post"}
+        >
+          <img
+            src={
+              checkIsLiked(likes, userId)
+                ? "/assets/icons/liked.svg"
+                : "/assets/icons/like.svg"
+            }
+            alt=""
+            width={20}
+            height={20}
+          />
+        </button>
 
         <p className="small-medium lag:base-medium">{likes.length}</p>
       </div>
@@ -85,15 +89,19 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
         {isSavingPost || isDeletingSaved ? (
           <Loader />
         ) : (
-          <img
-            src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
-            alt="save"
-            width={20}
-            height={20}
-            className="cursor-pointer"
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             onClick={handleSavePost}
-            loading="lazy"
-          />
+            aria-label={isSaved ? "Remove from saved posts" : "Save post"}
+          >
+            <img
+              src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
+              alt=""
+              width={20}
+              height={20}
+            />
+          </button>
         )}
       </div>
     </div>

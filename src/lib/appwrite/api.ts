@@ -175,7 +175,7 @@ export async function uploadFile(file: File) {
 
 export async function deleteFile(fileId: string) {
   try {
-    await storage.deleteFile(appwriteConfig.storageId, fileId);
+    await storage.deleteFile(appwriteConfig.bucketId, fileId);
 
     return { status: "ok" };
   } catch (error) {
