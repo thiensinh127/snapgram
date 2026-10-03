@@ -56,14 +56,7 @@ const LeftSidebar = () => {
                   className="flex items-center justify-center gap-4 p-4 lg:justify-start"
                   aria-label={link.label}
                 >
-                  <img
-                    src={link.imgURL}
-                    alt=""
-                    className={`group-hover:invert-white ${
-                      isActive && "invert-white"
-                    }`}
-                    loading="lazy"
-                  />
+                  <link.icon size={21} strokeWidth={isActive ? 2.5 : 2} aria-hidden="true" />
                   <span className="hidden lg:block">{link.label}</span>
                 </NavLink>
               </li>

@@ -12,21 +12,11 @@ const Bottombar = () => {
           <Link
             to={link.route}
             key={link.label}
-            className={`${
-              isActive && "bg-primary-500 rounded-[10px]"
-            } flex-center min-w-11 flex-col gap-1 rounded-xl p-2 transition `}
+            className={`bottom-bar-link ${isActive ? "bottom-bar-link_active" : ""}`}
+            aria-current={isActive ? "page" : undefined}
           >
-            <img
-              src={link.imgURL}
-              alt={link.label}
-              className={`group-hover:invert-white ${
-                isActive && "invert-white"
-              }`}
-              width={16}
-              height={16}
-              loading="lazy"
-            />
-            <p className="tiny-medium text-light-2"> {link.label}</p>
+            <link.icon size={21} strokeWidth={isActive ? 2.5 : 2} aria-hidden="true" />
+            <span className="bottom-bar-label">{link.label}</span>
           </Link>
         );
       })}

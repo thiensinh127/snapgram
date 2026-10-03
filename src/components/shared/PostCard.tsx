@@ -3,7 +3,8 @@ import { multiFormatDateString } from "@/lib/utils";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 import { getPostImageUrl } from "@/lib/images";
-import { getFilePreview } from "@/lib/appwrite/api";
+import { getFileView } from "@/lib/appwrite/api";
+import { Pencil } from "lucide-react";
 import PostStarts from "./PostStarts";
 
 type PostCardProps = { post: Models.Document };
@@ -48,13 +49,7 @@ const PostCard = ({ post }: PostCardProps) => {
           className={`${user.id !== post.creator.$id && "hidden"} flex h-11 w-11 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500`}
           aria-label="Edit post"
         >
-          <img
-            src="/assets/icons/edit.svg"
-            alt="edit"
-            width={20}
-            height={20}
-            loading="lazy"
-          />
+          <Pencil size={20} aria-hidden="true" />
         </Link>
       </div>
       <Link to={`/post/${post.$id}`}>
@@ -71,7 +66,7 @@ const PostCard = ({ post }: PostCardProps) => {
         <img
           src={
             post.imageId
-              ? String(getFilePreview(post.imageId, 960))
+              ? String(getFileView(post.imageId))
               : getPostImageUrl(post.imageUrl || "/assets/images/post-placeholder.svg", 960)
           }
           className="post-card_img"

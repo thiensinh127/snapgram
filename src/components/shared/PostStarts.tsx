@@ -7,6 +7,7 @@ import {
 import { checkIsLiked } from "@/lib/utils";
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
+import { Bookmark, Heart } from "lucide-react";
 import Loader from "./Loader";
 
 type PostStartsProps = {
@@ -70,16 +71,7 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
           onClick={handleLikePost}
           aria-label={checkIsLiked(likes, userId) ? "Unlike post" : "Like post"}
         >
-          <img
-            src={
-              checkIsLiked(likes, userId)
-                ? "/assets/icons/liked.svg"
-                : "/assets/icons/like.svg"
-            }
-            alt=""
-            width={20}
-            height={20}
-          />
+          <Heart size={21} fill={checkIsLiked(likes, userId) ? "currentColor" : "none"} aria-hidden="true" />
         </button>
 
         <p className="small-medium lag:base-medium">{likes.length}</p>
@@ -95,12 +87,7 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
             onClick={handleSavePost}
             aria-label={isSaved ? "Remove from saved posts" : "Save post"}
           >
-            <img
-              src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
-              alt=""
-              width={20}
-              height={20}
-            />
+            <Bookmark size={21} fill={isSaved ? "currentColor" : "none"} aria-hidden="true" />
           </button>
         )}
       </div>
