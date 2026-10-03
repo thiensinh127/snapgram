@@ -190,7 +190,7 @@
 
   /* Bottom bar */
   .bottom-bar {
-    @apply fixed bottom-0 left-0 z-50 flex-between w-full border-t border-white/10 bg-dark-2/95 px-4 pt-3 backdrop-blur-xl md:hidden;
+    @apply fixed bottom-3 left-3 right-3 z-50 flex-between w-auto rounded-[24px] border border-white/10 bg-dark-2/95 px-2 pt-2 shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden;
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
@@ -277,6 +277,47 @@
   .feed-sentinel {
     @apply flex min-h-12 items-center justify-center py-1 text-center;
   }
+
+  .bottom-bar-link {
+    @apply flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1.5 text-light-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500;
+  }
+
+  .bottom-bar-link_active {
+    @apply bg-primary-500 text-white shadow-lg shadow-primary-500/30;
+  }
+
+  .bottom-bar-label {
+    @apply text-[10px] font-semibold leading-none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .post-card {
+    animation: card-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .bottom-bar-link_active svg {
+    animation: nav-pop 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .post-card_img {
+    transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1), filter 300ms ease;
+  }
+
+  .post-card:hover .post-card_img {
+    transform: scale(1.015);
+    filter: saturate(1.08);
+  }
+}
+
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nav-pop {
+  from { transform: scale(0.72); }
+  to { transform: scale(1); }
 }
 
 @layer components {

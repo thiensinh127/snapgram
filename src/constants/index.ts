@@ -1,11 +1,13 @@
+import { Bookmark, Compass, House, SquarePlus } from "lucide-react";
+
 export const sidebarLinks = [
   {
-    imgURL: "/assets/icons/home.svg",
+    icon: House,
     route: "/",
     label: "Home",
   },
   {
-    imgURL: "/assets/icons/wallpaper.svg",
+    icon: Compass,
     route: "/explore",
     label: "Explore",
   },
@@ -15,12 +17,12 @@ export const sidebarLinks = [
   //   label: "People",
   // },
   {
-    imgURL: "/assets/icons/bookmark.svg",
+    icon: Bookmark,
     route: "/saved",
     label: "Saved",
   },
   {
-    imgURL: "/assets/icons/gallery-add.svg",
+    icon: SquarePlus,
     route: "/create-post",
     label: "Create Post",
   },
@@ -28,22 +30,22 @@ export const sidebarLinks = [
 
 export const bottombarLinks = [
   {
-    imgURL: "/assets/icons/home.svg",
+    icon: House,
     route: "/",
     label: "Home",
   },
   {
-    imgURL: "/assets/icons/wallpaper.svg",
+    icon: Compass,
     route: "/explore",
     label: "Explore",
   },
   {
-    imgURL: "/assets/icons/bookmark.svg",
+    icon: Bookmark,
     route: "/saved",
     label: "Saved",
   },
   {
-    imgURL: "/assets/icons/gallery-add.svg",
+    icon: SquarePlus,
     route: "/create-post",
     label: "Create",
   },

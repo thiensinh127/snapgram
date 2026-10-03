@@ -9,8 +9,10 @@ export type IContextType = {
   logout: () => Promise<boolean>;
 };
 
+import type { LucideIcon } from "lucide-react";
+
 export type INavLink = {
-  imgURL: string;
+  icon: LucideIcon;
   route: string;
   label: string;
 };
