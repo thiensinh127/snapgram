@@ -5,6 +5,7 @@ import { INavLink } from "@/types";
 import { useEffect } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import { LogOut } from "lucide-react";
 
 const LeftSidebar = () => {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -67,10 +68,11 @@ const LeftSidebar = () => {
       <Button
         onClick={() => signOut()}
         variant={"ghost"}
-        className="shad-button_ghost"
+        className="h-12 w-12 justify-center p-0 hover:bg-white/10 lg:h-auto lg:w-auto lg:justify-start lg:px-5"
+        aria-label="Log out"
       >
-        <img src="assets/icons/logout.svg" alt="" loading="lazy" />
-        <p className="small-medium lg:base-medium">Logout</p>
+        <LogOut size={21} aria-hidden="true" />
+        <p className="hidden small-medium lg:block lg:base-medium">Logout</p>
       </Button>
     </nav>
   );
