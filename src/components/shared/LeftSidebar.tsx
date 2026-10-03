@@ -51,7 +51,11 @@ const LeftSidebar = () => {
                   isActive && "bg-blue-700"
                 } leftsidebar-link group`}
               >
-                <NavLink to={link.route} className="flex items-center justify-center gap-4 p-4 lg:justify-start">
+                <NavLink
+                  to={link.route}
+                  className="flex items-center justify-center gap-4 p-4 lg:justify-start"
+                  aria-label={link.label}
+                >
                   <img
                     src={link.imgURL}
                     alt=""

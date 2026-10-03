@@ -52,7 +52,7 @@ export const useCreatePost = () => {
     mutationFn: (post: INewPost) => createPost(post),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+        queryKey: [QUERY_KEYS.GET_HOME_POSTS],
       });
     },
   });
@@ -145,6 +145,9 @@ export const useUpdatePost = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.$id],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_HOME_POSTS],
+      });
     },
   });
 };
@@ -157,7 +160,7 @@ export const useDeletePost = () => {
       deletePost(postId, imageId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+        queryKey: [QUERY_KEYS.GET_HOME_POSTS],
       });
     },
   });

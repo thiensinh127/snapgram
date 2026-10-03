@@ -251,7 +251,7 @@
 
 @layer components {
   .app-shell {
-    @apply flex min-h-[100dvh] w-full;
+    @apply flex min-h-[100dvh] w-full flex-col md:flex-row;
   }
 
   .app-main {
