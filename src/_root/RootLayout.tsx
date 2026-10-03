@@ -7,11 +7,11 @@ import { Outlet } from "react-router-dom";
 const RootLayout = () => {
   const { isLoading } = useUserContext();
   return (
-    <div className="w-full md:flex">
+    <div className="app-shell">
       <Topbar />
       <LeftSidebar />
 
-      <section className="flex flex-1 h-full">
+      <section className="app-main">
         {isLoading && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm">
             <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent" />

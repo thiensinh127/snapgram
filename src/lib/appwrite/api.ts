@@ -175,7 +175,7 @@ export async function uploadFile(file: File) {
 
 export async function deleteFile(fileId: string) {
   try {
-    await storage.deleteFile(appwriteConfig.storageId, fileId);
+    await storage.deleteFile(appwriteConfig.bucketId, fileId);
 
     return { status: "ok" };
   } catch (error) {
@@ -188,6 +188,9 @@ export async function deleteFile(fileId: string) {
 export const getFileView = (fileId: string) => {
   return storage.getFileView(appwriteConfig.bucketId, fileId);
 };
+
+export const getFilePreview = (fileId: string, width: number) =>
+  storage.getFilePreview(appwriteConfig.bucketId, fileId, width);
 
 export async function getRecentPosts() {
   try {
@@ -359,7 +362,11 @@ export async function getUserPosts(userId?: string) {
     const post = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
+      [
+        Query.equal("creator", userId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(20),
+      ]
     );
 
     if (!post) throw Error;
@@ -375,7 +382,7 @@ export async function searchPosts(searchTerm: string) {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.search("caption", searchTerm)]
+      [Query.search("caption", searchTerm), Query.limit(20)]
     );
 
     if (!posts) throw Error;
@@ -386,11 +393,15 @@ export async function searchPosts(searchTerm: string) {
   }
 }
 
-export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
-  const queries: any[] = [Query.orderDesc("$updatedAt"), Query.limit(9)];
+export async function getInfinitePosts({
+  pageParam,
+}: {
+  pageParam: string | null;
+}) {
+  const queries: any[] = [Query.orderDesc("$createdAt"), Query.limit(10)];
 
   if (pageParam) {
-    queries.push(Query.cursorAfter(pageParam.toString()));
+    queries.push(Query.cursorAfter(pageParam));
   }
 
   try {

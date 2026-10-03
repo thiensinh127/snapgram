@@ -2,6 +2,8 @@ import { useUserContext } from "@/context/AuthContext";
 import { multiFormatDateString } from "@/lib/utils";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
+import { getPostImageUrl } from "@/lib/images";
+import { getFilePreview } from "@/lib/appwrite/api";
 import PostStarts from "./PostStarts";
 
 type PostCardProps = { post: Models.Document };
@@ -11,7 +13,7 @@ const PostCard = ({ post }: PostCardProps) => {
   if (!post.creator) return;
 
   return (
-    <div className="post-card">
+    <article className="post-card">
       <div className="flex-between">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.creator.$id}`}>
@@ -21,7 +23,7 @@ const PostCard = ({ post }: PostCardProps) => {
                 "/assets/icons/profile-placeholder.svg"
               }
               alt="creator"
-              className="rounded-full w-12 lg:h-12"
+              className="h-12 w-12 rounded-full object-cover"
               loading="lazy"
             />
           </Link>
@@ -43,7 +45,8 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
         <Link
           to={`/update-post/${post.$id}`}
-          className={`${user.id !== post.creator.$id && "hidden"}`}
+          className={`${user.id !== post.creator.$id && "hidden"} flex h-11 w-11 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500`}
+          aria-label="Edit post"
         >
           <img
             src="/assets/icons/edit.svg"
@@ -66,14 +69,22 @@ const PostCard = ({ post }: PostCardProps) => {
           </ul>
         </div>
         <img
-          src={post.imageUrl || "/assets/images/post-placeholder.svg"}
+          src={
+            post.imageId
+              ? String(getFilePreview(post.imageId, 960))
+              : getPostImageUrl(post.imageUrl || "/assets/images/post-placeholder.svg", 960)
+          }
           className="post-card_img"
           alt="post image"
+          width={960}
+          height={720}
+          decoding="async"
+          loading="lazy"
         />
       </Link>
 
       <PostStarts post={post} userId={user.id} />
-    </div>
+    </article>
   );
 };
 

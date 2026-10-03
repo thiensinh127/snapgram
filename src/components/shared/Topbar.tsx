@@ -15,13 +15,13 @@ const Topbar = () => {
 
   return (
     <section className="topbar">
-      <div className="flex-between py-4 px-5">
+      <div className="flex-between px-5 py-3.5">
         <Link to="/" className=" flex gap-3 items-center">
           <img
             src="/assets/images/logo.svg"
             alt="logo"
             width={130}
-            height={325}
+            height={36}
             loading="lazy"
           />
         </Link>
@@ -30,7 +30,8 @@ const Topbar = () => {
           <Button
             onClick={() => signOut()}
             variant={"ghost"}
-            className="shad-button__ghost"
+            className="shad-button_ghost"
+            aria-label="Log out"
           >
             <img src="assets/icons/logout.svg" alt="" loading="lazy" />
           </Button>

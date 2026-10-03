@@ -25,6 +25,7 @@ import {
   updateUser,
 } from "../appwrite/api";
 import { QUERY_KEYS } from "./queryKeys";
+import { updateCachedPost } from "./postCache";
 
 export const useCreateUserAccount = () => {
   return useMutation({
@@ -51,7 +52,7 @@ export const useCreatePost = () => {
     mutationFn: (post: INewPost) => createPost(post),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+        queryKey: [QUERY_KEYS.GET_HOME_POSTS],
       });
     },
   });
@@ -61,6 +62,18 @@ export const useGetRecentPosts = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
     queryFn: getRecentPosts,
+  });
+};
+
+export const useGetHomePosts = () => {
+  return useInfiniteQuery({
+    initialPageParam: null as string | null,
+    queryKey: [QUERY_KEYS.GET_HOME_POSTS],
+    queryFn: getInfinitePosts,
+    getNextPageParam: (lastPage) => {
+      const documents = lastPage?.documents ?? [];
+      return documents.length ? documents[documents.length - 1].$id : undefined;
+    },
   });
 };
 
@@ -75,15 +88,7 @@ export const useLikePost = () => {
       likeArray: string[];
     }) => likePost(postId, likeArray),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.$id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
+      if (data) updateCachedPost(queryClient, data);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
@@ -98,12 +103,6 @@ export const useSavePost = () => {
       savePost(postId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
-      queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
     },
@@ -115,12 +114,6 @@ export const useDeleteSavePost = () => {
   return useMutation({
     mutationFn: (savedRecordId: string) => deleteSavePost(savedRecordId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_POSTS],
-      });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });
@@ -152,6 +145,9 @@ export const useUpdatePost = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_POST_BY_ID, data?.$id],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_HOME_POSTS],
+      });
     },
   });
 };
@@ -164,7 +160,7 @@ export const useDeletePost = () => {
       deletePost(postId, imageId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_RECENT_POSTS],
+        queryKey: [QUERY_KEYS.GET_HOME_POSTS],
       });
     },
   });
@@ -188,18 +184,13 @@ export const useSearchPosts = (searchTerm: string) => {
 
 export const useGetPosts = () => {
   return useInfiniteQuery({
-    initialPageParam: null,
+    initialPageParam: null as string | null,
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
     queryFn: getInfinitePosts,
     getNextPageParam: (lastPage: any) => {
       // If there's no data, there are no more pages.
-      if (lastPage && lastPage.documents.length === 0) {
-        return null;
-      }
-
-      // Use the $id of the last document as the cursor.
-      const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
-      return lastId;
+      const documents = lastPage?.documents ?? [];
+      return documents.length ? documents[documents.length - 1].$id : undefined;
     },
   });
 };

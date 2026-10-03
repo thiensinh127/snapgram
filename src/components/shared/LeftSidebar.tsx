@@ -19,7 +19,7 @@ const LeftSidebar = () => {
   return (
     <nav className="leftsidebar">
       <div className="flex flex-col gap-11">
-        <Link to="/" className="flex gap-3 items-center">
+        <Link to="/" className="hidden gap-3 items-center lg:flex">
           <img
             src="/assets/images/logo.svg"
             alt="logo"
@@ -29,14 +29,14 @@ const LeftSidebar = () => {
           />
         </Link>
 
-        <Link to={`/profile/${user?.id}`} className="flex items-center gap-3">
+        <Link to={`/profile/${user?.id}`} className="flex items-center gap-3 justify-center lg:justify-start">
           <img
             src={user.imageUrl || "/assets/images/profile-placeholder.svg"}
             alt="profile"
             className="h-14 w-14 rounded-full"
             loading="lazy"
           />
-          <div className="flex flex-col">
+          <div className="hidden flex-col lg:flex">
             <p className="body-bold">{user.name}</p>
             <p className="small-regular text-light-3">@${user.username}</p>
           </div>
@@ -51,7 +51,11 @@ const LeftSidebar = () => {
                   isActive && "bg-blue-700"
                 } leftsidebar-link group`}
               >
-                <NavLink to={link.route} className=" flex gap-4 items-end p-4">
+                <NavLink
+                  to={link.route}
+                  className="flex items-center justify-center gap-4 p-4 lg:justify-start"
+                  aria-label={link.label}
+                >
                   <img
                     src={link.imgURL}
                     alt=""
@@ -60,7 +64,7 @@ const LeftSidebar = () => {
                     }`}
                     loading="lazy"
                   />
-                  {link.label}
+                  <span className="hidden lg:block">{link.label}</span>
                 </NavLink>
               </li>
             );
@@ -70,7 +74,7 @@ const LeftSidebar = () => {
       <Button
         onClick={() => signOut()}
         variant={"ghost"}
-        className="shad-button__ghost"
+        className="shad-button_ghost"
       >
         <img src="assets/icons/logout.svg" alt="" loading="lazy" />
         <p className="small-medium lg:base-medium">Logout</p>
