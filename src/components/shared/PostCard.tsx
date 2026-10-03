@@ -2,6 +2,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { multiFormatDateString } from "@/lib/utils";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
+import { getPostImageUrl } from "@/lib/images";
 import PostStarts from "./PostStarts";
 
 type PostCardProps = { post: Models.Document };
@@ -11,7 +12,7 @@ const PostCard = ({ post }: PostCardProps) => {
   if (!post.creator) return;
 
   return (
-    <div className="post-card">
+    <article className="post-card">
       <div className="flex-between">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.creator.$id}`}>
@@ -21,7 +22,7 @@ const PostCard = ({ post }: PostCardProps) => {
                 "/assets/icons/profile-placeholder.svg"
               }
               alt="creator"
-              className="rounded-full w-12 lg:h-12"
+              className="h-12 w-12 rounded-full object-cover"
               loading="lazy"
             />
           </Link>
@@ -66,14 +67,17 @@ const PostCard = ({ post }: PostCardProps) => {
           </ul>
         </div>
         <img
-          src={post.imageUrl || "/assets/images/post-placeholder.svg"}
+          src={getPostImageUrl(post.imageUrl || "/assets/images/post-placeholder.svg", 960)}
           className="post-card_img"
           alt="post image"
+          width={960}
+          height={720}
+          decoding="async"
         />
       </Link>
 
       <PostStarts post={post} userId={user.id} />
-    </div>
+    </article>
   );
 };
 
