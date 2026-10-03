@@ -63,27 +63,33 @@ const PostStarts = ({ post, userId }: PostStartsProps) => {
   };
 
   return (
-    <div className="flex justify-between items-center z-20">
-      <div className="flex gap-2 mr-5">
+    <div className="z-20 flex items-center justify-between border-t border-white/10 pt-2">
+      <div className="flex items-center gap-1">
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          className={`flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+            checkIsLiked(likes, userId) ? "text-primary-500" : "text-light-3"
+          }`}
           onClick={handleLikePost}
           aria-label={checkIsLiked(likes, userId) ? "Unlike post" : "Like post"}
         >
           <Heart size={21} fill={checkIsLiked(likes, userId) ? "currentColor" : "none"} aria-hidden="true" />
         </button>
 
-        <p className="small-medium lag:base-medium">{likes.length}</p>
+        <p className="flex h-10 items-center px-1 text-sm font-semibold text-light-2">
+          {likes.length}
+        </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex h-10 items-center">
         {isSavingPost || isDeletingSaved ? (
           <Loader />
         ) : (
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            className={`flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+              isSaved ? "text-primary-500" : "text-light-3"
+            }`}
             onClick={handleSavePost}
             aria-label={isSaved ? "Remove from saved posts" : "Save post"}
           >
