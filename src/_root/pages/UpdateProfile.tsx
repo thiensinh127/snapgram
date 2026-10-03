@@ -24,6 +24,7 @@ import {
   useGetUserById,
   useUpdateUser,
 } from "@/lib/react-query/queriesAndMutation";
+import { UserRound } from "lucide-react";
 
 const UpdateProfile = () => {
   const navigate = useNavigate();
@@ -77,24 +78,17 @@ const UpdateProfile = () => {
   };
 
   return (
-    <div className="flex flex-1">
-      <div className="common-container">
-        <div className="flex-start gap-3 justify-start w-full max-w-5xl">
-          <img
-            src="/assets/icons/edit.svg"
-            width={36}
-            height={36}
-            alt="edit"
-            className="invert-white"
-            loading="lazy"
-          />
-          <h2 className="h3-bold md:h2-bold text-left w-full">Edit Profile</h2>
-        </div>
+    <div className="flex min-w-0 flex-1">
+      <div className="create-post-container">
+        <header className="create-post-heading">
+          <span className="create-post-icon"><UserRound size={22} aria-hidden="true" /></span>
+          <div><p className="feed-eyebrow">Account settings</p><h1 className="h3-bold md:h2-bold">Edit profile</h1><p className="small-regular text-light-3">Shape how the community sees you.</p></div>
+        </header>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleUpdate)}
-            className="flex flex-col gap-7 w-full mt-4 max-w-5xl"
+            className="create-post-form max-w-3xl"
           >
             <FormField
               control={form.control}
