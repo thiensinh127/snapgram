@@ -49,7 +49,7 @@ const LeftSidebar = () => {
               <li
                 key={link.label}
                 className={`${
-                  isActive && "bg-blue-700"
+                  isActive && "bg-primary-500 text-white shadow-lg shadow-primary-500/20"
                 } leftsidebar-link group`}
               >
                 <NavLink
