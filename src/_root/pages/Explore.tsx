@@ -9,6 +9,7 @@ import {
 } from "@/lib/react-query/queriesAndMutation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { Compass, Search, SlidersHorizontal } from "lucide-react";
 
 const Explore = () => {
   const { ref, inView } = useInView();
@@ -38,20 +39,21 @@ const Explore = () => {
     posts.pages.every((item: any) => item.documents.length === 0);
 
   return (
-    <div className="explore-container">
-      <div className="explore-inner_container">
-        <h2 className="h3-bold md:h2-bold w-full">Search Posts</h2>
-        <div className="flex gap-1 px-4 w-full rounded-lg bg-dark-4">
-          <img
-            src="/assets/icons/search.svg"
-            width={24}
-            height={24}
-            alt="search"
-            loading="lazy"
-          />
+    <div className="explore-container discovery-page">
+      <div className="explore-inner_container discovery-intro">
+        <div className="page-header">
+          <span className="page-header-icon"><Compass size={22} aria-hidden="true" /></span>
+          <div>
+            <p className="feed-eyebrow">Discover creators</p>
+            <h1 className="h3-bold md:h2-bold">Explore ideas</h1>
+            <p className="small-regular text-light-3">Find a little inspiration for your next post.</p>
+          </div>
+        </div>
+        <div className="discovery-search">
+          <Search size={20} aria-hidden="true" className="text-light-3" />
           <Input
             type="text"
-            placeholder="Search"
+            placeholder="Search posts, places or topics"
             className="explore-search"
             value={searchValue}
             onChange={(e) => {
@@ -62,32 +64,28 @@ const Explore = () => {
         </div>
       </div>
 
-      <div className="flex-between w-full max-w-5xl mt-16 mb-7">
-        <h3 className="body-bold md:h3-bold">Popular Today</h3>
-
-        <div className="flex-center gap-3 bg-dark-3 rounded-xl px-4 py-2 cursor-pointer">
-          <p className="small-medium md:base-medium text-light-2">All</p>
-          <img
-            src="/assets/icons/filter.svg"
-            width={20}
-            height={20}
-            alt="filter"
-            loading="lazy"
-          />
+      <div className="discovery-section-heading">
+        <div>
+          <p className="feed-eyebrow">Curated for you</p>
+          <h2 className="body-bold md:h3-bold">Popular today</h2>
         </div>
+
+        <button type="button" className="discovery-filter" aria-label="Filter posts">
+          <span>All posts</span><SlidersHorizontal size={17} aria-hidden="true" />
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-9 w-full max-w-5xl">
+      <div className="w-full max-w-5xl">
         {shouldShowSearchResults ? (
           <SearchResults
             isSearchFetching={isSearchFetching}
             searchedPosts={searchedPosts}
           />
         ) : shouldShowPosts ? (
-          <p className="text-light-4 mt-10 text-center w-full">End of posts</p>
+          <div className="empty-state"><p className="body-bold">Nothing to explore yet</p><p className="small-regular text-light-3">Check back shortly for fresh ideas.</p></div>
         ) : (
           posts.pages.map((item: any, index) => (
-            <GridPostList key={`page-${index}`} posts={item.documents} />
+              <GridPostList key={`page-${index}`} posts={item.documents} showStats={false} />
           ))
         )}
       </div>

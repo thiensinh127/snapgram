@@ -209,7 +209,7 @@
 
   /* Grid Post List */
   .grid-container {
-    @apply w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7 max-w-5xl;
+    @apply grid w-full grid-cols-1 gap-4 xs:grid-cols-2 lg:grid-cols-3 lg:gap-5;
   }
 
   .grid-post_link {
@@ -334,6 +334,21 @@
   .bottom-bar-label {
     @apply text-[10px] font-semibold leading-none;
   }
+
+  .page-header {
+    @apply flex items-start gap-4 rounded-[28px] border border-white/10 bg-white/[0.035] p-5 sm:items-center sm:p-6;
+  }
+
+  .page-header-icon {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-500/15 text-primary-500;
+  }
+
+  .discovery-page { @apply gap-6 pb-28 md:gap-8 md:pb-10; }
+  .discovery-intro { @apply max-w-5xl gap-4; }
+  .discovery-search { @apply flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-dark-3/80 px-4 shadow-lg shadow-black/10; }
+  .discovery-section-heading { @apply flex w-full max-w-5xl items-end justify-between gap-4; }
+  .discovery-filter { @apply flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-dark-3 px-3 py-2 text-sm font-semibold text-light-2 transition hover:border-primary-500/60 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500; }
+  .empty-state { @apply flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-[24px] border border-dashed border-white/15 bg-white/[0.025] px-6 text-center; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
