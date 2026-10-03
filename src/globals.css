@@ -355,6 +355,16 @@
   }
 }
 
+@media (max-width: 767px) {
+  .common-container,
+  .explore-container,
+  .post_details-container,
+  .profile-container,
+  .saved-container {
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+  }
+}
+
 @keyframes card-enter {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
