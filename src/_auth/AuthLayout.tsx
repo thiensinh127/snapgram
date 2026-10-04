@@ -14,15 +14,18 @@ const AuthLayout = () => {
         <Outlet />
       </section>
 
-      <img
-        src="/assets/images/side-img.svg"
-        alt=""
-        className="hidden xl:block h-screen w-1/2 object-cover bg-no-repeat"
-        width={720}
-        height={1024}
-        fetchPriority="high"
-        decoding="async"
-      />
+      <picture className="hidden h-screen w-1/2 xl:block" aria-hidden="true">
+        <source media="(min-width: 1280px)" srcSet="/assets/images/side-img.svg" />
+        <img
+          src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+          alt=""
+          className="h-full w-full object-cover"
+          width={720}
+          height={1024}
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
     </>
   );
 };
