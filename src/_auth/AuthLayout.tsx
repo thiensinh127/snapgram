@@ -15,7 +15,7 @@ const AuthLayout = () => {
       </section>
 
       <picture className="hidden h-screen w-1/2 xl:block" aria-hidden="true">
-        <source media="(min-width: 1280px)" srcSet="/assets/images/side-img.svg" />
+        <source media="(min-width: 1280px)" srcSet="/assets/images/side-img.jpg" />
         <img
           src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
           alt=""
