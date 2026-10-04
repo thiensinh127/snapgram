@@ -16,9 +16,12 @@ const AuthLayout = () => {
 
       <img
         src="/assets/images/side-img.svg"
-        alt="logo"
+        alt=""
         className="hidden xl:block h-screen w-1/2 object-cover bg-no-repeat"
-        loading="lazy"
+        width={720}
+        height={1024}
+        fetchPriority="high"
+        decoding="async"
       />
     </>
   );

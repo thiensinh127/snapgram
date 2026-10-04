@@ -60,11 +60,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
         setIsAuthenticated(true);
         return true;
-      } else {
-        throw new Error("No current user");
       }
-    } catch (error) {
-      console.error("Error in checkAuthUser:", error);
+      setIsAuthenticated(false);
+      setUser(INITIAL_USER);
+      if (!['/sign-in', '/sign-up'].includes(location.pathname)) navigate('/sign-in');
+      return false;
+    } catch {
       setIsAuthenticated(false);
       setUser(INITIAL_USER);
       if (!["/sign-in", "/sign-up"].includes(location.pathname)) {
@@ -134,7 +135,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [navigate]);
 
   useEffect(() => {
-    checkAuthUser();
+    void checkAuthUser();
   }, [checkAuthUser]);
 
   const value = {

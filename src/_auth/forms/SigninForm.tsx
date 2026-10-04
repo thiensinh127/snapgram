@@ -75,10 +75,9 @@ const SigninForm = () => {
       <div className="sm:w-420 flex-center flex-col">
         <img
           src="/assets/images/logo.svg"
-          alt="logo"
-          loading="lazy"
-          width="100"
-          height="40"
+          alt="Snapgram"
+          width={171}
+          height={36}
         />
         <h2 className="h3-bold md:h2bold pt-5 sm:pt-12">
           Login to your account
@@ -130,7 +129,8 @@ const SigninForm = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-gray-500"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
